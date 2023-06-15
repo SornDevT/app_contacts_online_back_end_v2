@@ -31,6 +31,7 @@ class User extends Authenticatable implements JWTSubject  // new
         'add_village',
         'add_city',
         'add_province',
+        'add_detail',
         'web',
         'job',
         'job_type',
