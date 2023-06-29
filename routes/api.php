@@ -23,6 +23,7 @@ Route::post("register",[UserController::class,"register"]);
 Route::post("login",[UserController::class,"login"]);
 Route::get("logout",[UserController::class,"logout"]);
 
+Route::get("check_user",[UserController::class,"check_user"]);         // ກວດຊອບ ຜູ້ໃຊ້ login
 Route::get("user",[UserController::class,"index"]);         // ດຶງຜູ້ໃຊ້ທັງໝົດ
 Route::get("user/{id}",[UserController::class,"user"]);     // ດຶງຜູ້ໃຊ້ ຕາມ id
 Route::post("user",[UserController::class,"add_user"]);     // ເພີ່ມຂໍ້ມູນຜູ້ໃຊ້

@@ -71,23 +71,51 @@ class UserController extends Controller
                 $user_type = 'user';
             }
 
-            $user = new User();
-            $user->name = $request->name;
-            $user->last_name = $request->last_name;
-            $user->gender = $request->gender;
-            $user->image = $request->image;
-            $user->tel = $request->tel;
-            $user->birth_day = $request->birth_day;
-            $user->add_village = $request->add_village;
-            $user->add_city = $request->add_city;
-            $user->add_province = $request->add_province;
-            $user->web = $request->web;
-            $user->job = $request->job;
-            $user->job_type = $request->job_type;
-            $user->user_type = $user_type;
-            $user->email = $request->email;
-            $user->password = hash::make($request->password);
-            $user->save();
+            if($request->file('image')){
+                $upload_path = "img";
+                $generate_new_name = time().'.'.$request->image->getClientOriginalExtension();
+                $request->image->move(public_path($upload_path),$generate_new_name);
+
+                $user = new User();
+                $user->name = $request->name;
+                $user->last_name = $request->last_name;
+                $user->gender = $request->gender;
+                $user->image = $generate_new_name;
+                $user->tel = $request->tel;
+                $user->birth_day = $request->birth_day;
+                $user->add_village = $request->add_village;
+                $user->add_city = $request->add_city;
+                $user->add_province = $request->add_province;
+                $user->web = $request->web;
+                $user->job = $request->job;
+                $user->job_type = $request->job_type;
+                $user->user_type = $user_type;
+                $user->email = $request->email;
+                $user->password = hash::make($request->password);
+                $user->save();
+
+            } else {
+                $generate_new_name = '';
+                $user = new User();
+                $user->name = $request->name;
+                $user->last_name = $request->last_name;
+                $user->gender = $request->gender;
+                $user->image = $generate_new_name;
+                $user->tel = $request->tel;
+                $user->birth_day = $request->birth_day;
+                $user->add_village = $request->add_village;
+                $user->add_city = $request->add_city;
+                $user->add_province = $request->add_province;
+                $user->web = $request->web;
+                $user->job = $request->job;
+                $user->job_type = $request->job_type;
+                $user->user_type = $user_type;
+                $user->email = $request->email;
+                $user->password = hash::make($request->password);
+                $user->save();
+            }
+
+           
 
             $success = true;
             $message = "ລົງທະບຽນສຳເລັດ";
@@ -103,6 +131,18 @@ class UserController extends Controller
         ];
         return response()->json($response);
 
+    }
+
+    public function check_user(){
+
+            $user = Auth::user(); // Auth::user()
+            $user_all = User::all();
+
+            $response = [
+                'user'=> $user,
+                'user_all'=> $user_all,
+            ];
+            return response()->json($response);
     }
 
     public function index(){
@@ -165,47 +205,113 @@ class UserController extends Controller
 
            $user = User::find($id);
 
-           if($request->password){
-            $user->update([
-                'name' => $request->name,
-                'last_name' => $request->last_name,
-                'gender' => $request->gender,
-                'password' => Hash::make($request->password),
-                // 'image' => $generated_new_name,
-                'tel' => $request->tel,
-                'birth_day' => $request->birth_day,
-                'add_village' => $request->add_village,
-                'add_city' => $request->add_city,
-                'add_province' => $request->add_province,
-                'add_detail' => $request->add_detail,
-                'email' => $request->email,
-                'web' => $request->web,
-                'job' => $request->job,
-                'job_type' => $request->job_type,
-            ]);
-    
+        //    return $request->image->getClientOriginalExtension();
 
-           }else{
-            
-            $user->update([
-                'name' => $request->name,
-                'last_name' => $request->last_name,
-                'gender' => $request->gender,
-                // 'password' => Hash::make($request->password),
-                // 'image' => $generated_new_name,
-                'tel' => $request->tel,
-                'birth_day' => $request->birth_day,
-                'add_village' => $request->add_village,
-                'add_city' => $request->add_city,
-                'add_province' => $request->add_province,
-                'add_detail' => $request->add_detail,
-                'email' => $request->email,
-                'web' => $request->web,
-                'job' => $request->job,
-                'job_type' => $request->job_type,
-            ]);
+           if($request->file('image')){
+
+
+                $upload_path = "img";
+
+                // ກວດຊອບຮູບເກົ່າໃຫ້ທຳການລຶບອອກ
+                if($user->image!='' && $user->image!=null){
+                    if(file_exists('img/'.$user->image)){
+                        unlink('img/'.$user->image);
+                    }
+                }
+
+
+                $generated_new_name = time().'.'.$request->image->getClientOriginalExtension();
+                $request->image->move(public_path($upload_path),$generated_new_name);
+
+
+            if($request->password){
+                $user->update([
+                    'name' => $request->name,
+                    'last_name' => $request->last_name,
+                    'gender' => $request->gender,
+                    'password' => Hash::make($request->password),
+                    'image' => $generated_new_name,
+                    'tel' => $request->tel,
+                    'birth_day' => $request->birth_day,
+                    'add_village' => $request->add_village,
+                    'add_city' => $request->add_city,
+                    'add_province' => $request->add_province,
+                    'add_detail' => $request->add_detail,
+                    'email' => $request->email,
+                    'web' => $request->web,
+                    'job' => $request->job,
+                    'job_type' => $request->job_type,
+                ]);
+        
     
-           }
+               }else{
+                
+                $user->update([
+                    'name' => $request->name,
+                    'last_name' => $request->last_name,
+                    'gender' => $request->gender,
+                    // 'password' => Hash::make($request->password),
+                    'image' => $generated_new_name,
+                    'tel' => $request->tel,
+                    'birth_day' => $request->birth_day,
+                    'add_village' => $request->add_village,
+                    'add_city' => $request->add_city,
+                    'add_province' => $request->add_province,
+                    'add_detail' => $request->add_detail,
+                    'email' => $request->email,
+                    'web' => $request->web,
+                    'job' => $request->job,
+                    'job_type' => $request->job_type,
+                ]);
+        
+               }
+
+           
+        } else {
+            if($request->password){
+                $user->update([
+                    'name' => $request->name,
+                    'last_name' => $request->last_name,
+                    'gender' => $request->gender,
+                    'password' => Hash::make($request->password),
+                    // 'image' => $generated_new_name,
+                    'tel' => $request->tel,
+                    'birth_day' => $request->birth_day,
+                    'add_village' => $request->add_village,
+                    'add_city' => $request->add_city,
+                    'add_province' => $request->add_province,
+                    'add_detail' => $request->add_detail,
+                    'email' => $request->email,
+                    'web' => $request->web,
+                    'job' => $request->job,
+                    'job_type' => $request->job_type,
+                ]);
+        
+    
+               }else{
+                
+                $user->update([
+                    'name' => $request->name,
+                    'last_name' => $request->last_name,
+                    'gender' => $request->gender,
+                    // 'password' => Hash::make($request->password),
+                    // 'image' => $generated_new_name,
+                    'tel' => $request->tel,
+                    'birth_day' => $request->birth_day,
+                    'add_village' => $request->add_village,
+                    'add_city' => $request->add_city,
+                    'add_province' => $request->add_province,
+                    'add_detail' => $request->add_detail,
+                    'email' => $request->email,
+                    'web' => $request->web,
+                    'job' => $request->job,
+                    'job_type' => $request->job_type,
+                ]);
+        
+               }
+        }
+
+          
 
           
 
